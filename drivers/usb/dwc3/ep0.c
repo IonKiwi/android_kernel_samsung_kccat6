@@ -765,6 +765,7 @@ static int dwc3_ep0_std_request(struct dwc3 *dwc, struct usb_ctrlrequest *ctrl)
 		break;
 	case USB_REQ_SET_INTERFACE:
 		dev_vdbg(dwc->dev, "USB_REQ_SET_INTERFACE\n");
+		dwc->start_config_issued = false;
 		ret = dwc3_ep0_set_interface(dwc, ctrl);
 		break;
 	default:
