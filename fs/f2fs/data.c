@@ -1630,7 +1630,8 @@ out:
 	return err;
 }
 
-void f2fs_invalidate_page(struct page *page, unsigned long offset)
+void f2fs_invalidate_data_page(struct page *page, unsigned int offset,
+			       unsigned int length)
 {
 	struct inode *inode = page->mapping->host;
 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
@@ -1654,7 +1655,7 @@ void f2fs_invalidate_page(struct page *page, unsigned long offset)
 	ClearPagePrivate(page);
 }
 
-int f2fs_release_page(struct page *page, gfp_t wait)
+int f2fs_release_data_page(struct page *page, gfp_t wait)
 {
 	/* If this is dirty page, keep PagePrivate */
 	if (PageDirty(page))
@@ -1718,8 +1719,8 @@ const struct address_space_operations f2fs_dblock_aops = {
 	.write_begin	= f2fs_write_begin,
 	.write_end	= f2fs_write_end,
 	.set_page_dirty	= f2fs_set_data_page_dirty,
-	.invalidatepage	= f2fs_invalidate_page,
-	.releasepage	= f2fs_release_page,
+	.invalidatepage	= f2fs_invalidate_data_page,
+	.releasepage	= f2fs_release_data_page,
 	.direct_IO	= f2fs_direct_IO,
 	.bmap		= f2fs_bmap,
 };
