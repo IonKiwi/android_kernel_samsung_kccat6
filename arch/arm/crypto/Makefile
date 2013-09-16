@@ -6,6 +6,7 @@
 obj-$(CONFIG_CRYPTO_FIPS) += first_file_asm.o
 
 obj-$(CONFIG_CRYPTO_AES_ARM) += aes-arm.o
+obj-$(CONFIG_CRYPTO_AES_ARM_BS) += aes-arm-bs.o
 obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
 obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
 obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
@@ -22,8 +23,8 @@ sha512-arm-neon-y := sha512-armv7-neon.o sha512_neon_glue.o
 quiet_cmd_perl = PERL    $@
       cmd_perl = $(PERL) $(<) > $(@)
 
-aes-arm-y  := aes-armv4.o aes_glue.o
-sha1-arm-y := sha1-armv4-large.o sha1_glue.o
+$(src)/aesbs-core.S_shipped: $(src)/bsaes-armv7.pl
+	$(call cmd,perl)
 
 $(src)/sha256-core.S_shipped: $(src)/sha256-armv4.pl
 	$(call cmd,perl)
