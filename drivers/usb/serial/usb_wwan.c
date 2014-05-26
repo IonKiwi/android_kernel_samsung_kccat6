@@ -805,7 +805,6 @@ int usb_wwan_resume(struct usb_serial *serial)
 	int err_count = 0;
 
 	spin_lock_irq(&intfdata->susp_lock);
-	intfdata->suspended = 0;
 	for (i = 0; i < serial->num_ports; i++) {
 		/* walk all ports */
 		port = serial->port[i];
@@ -844,11 +843,11 @@ int usb_wwan_resume(struct usb_serial *serial)
 				dev_err(&port->dev, "%s: Error %d for bulk URB[%d]: %p %d\n",
 					__func__, err, j, urb, i);
 				usb_unanchor_urb(urb);
-				intfdata->suspended = 1;
 				err_count++;
 			}
 		}
 	}
+	intfdata->suspended = 0;
 	spin_unlock_irq(&intfdata->susp_lock);
 
 	if (err_count)
