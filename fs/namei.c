@@ -326,7 +326,7 @@ int generic_permission(struct inode *inode, int mask)
 			return 0;
 		if (!(mask & MAY_WRITE))
 			if (capable_wrt_inode_uidgid(inode,
-						CAP_DAC_READ_SEARCH))
+						     CAP_DAC_READ_SEARCH))
 				return 0;
 		return -EACCES;
 	}
