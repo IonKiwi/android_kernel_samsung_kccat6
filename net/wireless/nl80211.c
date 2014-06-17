@@ -6827,8 +6827,6 @@ static int nl80211_testmode_dump(struct sk_buff *skb,
 	return err;
 }
 
-#endif
-
 struct sk_buff *__cfg80211_alloc_event_skb(struct wiphy *wiphy,
 					   enum nl80211_commands cmd,
 					   enum nl80211_attrs attr,
@@ -6879,6 +6877,7 @@ void __cfg80211_send_event_skb(struct sk_buff *skb, gfp_t gfp)
 			nl80211_testmode_mcgrp.id, gfp);
 }
 EXPORT_SYMBOL(__cfg80211_send_event_skb);
+#endif
 
 static int nl80211_connect(struct sk_buff *skb, struct genl_info *info)
 {
@@ -8600,7 +8599,7 @@ static int nl80211_vendor_cmd(struct sk_buff *skb, struct genl_info *info)
 	int i, err;
 	u32 vid, subcmd;
 
-	if (!rdev->wiphy.vendor_commands)
+	if (!rdev || !rdev->wiphy.vendor_commands)
 		return -EOPNOTSUPP;
 
 	if (IS_ERR(wdev)) {
@@ -8637,7 +8636,7 @@ static int nl80211_vendor_cmd(struct sk_buff *skb, struct genl_info *info)
 				return -EINVAL;
 
 			if (vcmd->flags & WIPHY_VENDOR_CMD_NEED_RUNNING) {
-				if (wdev->netdev &&
+				if (!wdev->netdev ||
 				    !netif_running(wdev->netdev))
 					return -ENETDOWN;
 			}
@@ -8652,9 +8651,8 @@ static int nl80211_vendor_cmd(struct sk_buff *skb, struct genl_info *info)
 
 		rdev->cur_cmd_info = info;
 		err = rdev->wiphy.vendor_commands[i].doit(&rdev->wiphy, wdev,
-							   data, len);
+								data, len);
 		rdev->cur_cmd_info = NULL;
-
 		return err;
 	}
 
