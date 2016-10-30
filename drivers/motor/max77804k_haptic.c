@@ -114,6 +114,7 @@ static int max77804k_haptic_probe(struct platform_device *pdev)
 	hap_data->pmic_i2c = max77804k->i2c;
 	pdata->reg2 = MAX77804K_MOTOR_LRA | EXT_PWM | MAX77804K_DIVIDER_128;
 	hap_data->pdata = pdata;
+	max77804k_haptic_i2c(hap_data, true);
 
 	spin_lock_init(&(hap_data->lock));
 
