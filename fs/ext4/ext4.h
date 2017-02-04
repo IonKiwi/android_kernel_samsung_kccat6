@@ -591,7 +591,6 @@ enum {
 #define EXT4_FREE_BLOCKS_NO_QUOT_UPDATE	0x0008
 #define EXT4_FREE_BLOCKS_NOFREE_FIRST_CLUSTER	0x0010
 #define EXT4_FREE_BLOCKS_NOFREE_LAST_CLUSTER	0x0020
-#define EXT4_FREE_BLOCKS_RESERVE		0x0040
 
 /*
  * ioctl commands
@@ -1205,7 +1204,6 @@ struct ext4_sb_info {
 	unsigned int s_mount_flags;
 	unsigned int s_def_mount_opt;
 	ext4_fsblk_t s_sb_block;
-	atomic64_t s_r_blocks_count;
 	atomic64_t s_resv_clusters;
 	kuid_t s_resuid;
 	kgid_t s_resgid;
@@ -2333,14 +2331,6 @@ extern void ext4_group_desc_csum_set(struct super_block *sb, __u32 group,
 				     struct ext4_group_desc *gdp);
 extern int ext4_register_li_request(struct super_block *sb,
 				    ext4_group_t first_not_zeroed);
-/* for debugging, sangwoo2.lee */
-extern void print_iloc_info(struct super_block *sb,
-				struct ext4_iloc iloc);
-extern void print_bh(struct super_block *sb,
-                  struct buffer_head *bh, int start, int len);
-extern void print_block_data(struct super_block *sb, sector_t blocknr,
-                  unsigned char *data_to_dump, int start, int len);
-/* for debugging */
 
 static inline int ext4_has_group_desc_csum(struct super_block *sb)
 {

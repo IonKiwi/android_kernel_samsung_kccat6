@@ -337,7 +337,6 @@ out:
 		if (!fatal)
 			fatal = err;
 	} else {
-		/* for debugging */
 		ext4_error(sb, "bit already cleared for inode %lu", ino);
 		if (gdp && !EXT4_MB_GRP_IBITMAP_CORRUPT(grp)) {
 			int count;
