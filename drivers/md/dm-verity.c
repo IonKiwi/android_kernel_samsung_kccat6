@@ -41,8 +41,6 @@ int dmv_check_failed;
 #define DM_VERITY_OPT_LOGGING		"ignore_corruption"
 #define DM_VERITY_OPT_RESTART		"restart_on_corruption"
 
-#define	FLAT_HASH_VERIFICATION		0
-
 static unsigned dm_verity_prefetch_cluster = DM_VERITY_DEFAULT_PREFETCH_SIZE;
 
 module_param_named(prefetch_cluster, dm_verity_prefetch_cluster, uint, S_IRUGO | S_IWUSR);
@@ -274,10 +272,8 @@ static int verity_verify_level(struct dm_verity_io *io, sector_t block,
 {
 	struct dm_verity *v = io->v;
 	struct dm_buffer *buf;
-#if	!FLAT_HASH_VERIFICATION
 	struct buffer_aux *aux;
 	int r;
-#endif
 	u8 *data;
 	sector_t hash_block;
 	unsigned offset;
@@ -289,7 +285,6 @@ static int verity_verify_level(struct dm_verity_io *io, sector_t block,
 		return PTR_ERR(data);
 
 /* Implicitly trust the obtained hash meta-data for flat verification */
-#if	!FLAT_HASH_VERIFICATION
 	aux = dm_bufio_get_aux_data(buf);
 
 	if (!aux->hash_verified) {
@@ -347,7 +342,6 @@ static int verity_verify_level(struct dm_verity_io *io, sector_t block,
 		} else
 			aux->hash_verified = 1;
 	}
-#endif
 
 	data += offset;
 
@@ -356,12 +350,10 @@ static int verity_verify_level(struct dm_verity_io *io, sector_t block,
 	dm_bufio_release(buf);
 	return 0;
 
-#if	!FLAT_HASH_VERIFICATION
 release_ret_r:
 	dm_bufio_release(buf);
 
 	return r;
-#endif
 }
 
 /*
@@ -371,9 +363,7 @@ static int verity_verify_io(struct dm_verity_io *io)
 {
 	struct dm_verity *v = io->v;
 	unsigned b;
-#if	!FLAT_HASH_VERIFICATION
 	int i;
-#endif
 	unsigned vector = 0, offset = 0;
 
 	for (b = 0; b < io->n_blocks; b++) {
@@ -396,8 +386,6 @@ static int verity_verify_io(struct dm_verity_io *io)
 			if (r < 0)
 				return r;
 		}
-#if	!FLAT_HASH_VERIFICATION
-/* flat model does not need meta-data verification */
 
 		memcpy(io_want_digest(v, io), v->root_digest, v->digest_size);
 
@@ -406,7 +394,6 @@ static int verity_verify_io(struct dm_verity_io *io)
 			if (unlikely(r))
 				return r;
 		}
-#endif
 test_block_hash:
 		desc = io_hash_desc(v, io);
 		desc->tfm = v->tfm;
@@ -535,14 +522,7 @@ static void verity_prefetch_io(struct work_struct *work)
 	struct dm_verity *v = pw->v;
 	int i;
 
-#if	!FLAT_HASH_VERIFICATION
 	for (i = v->levels - 2; i >= 0; i--) {
-#else
-	/* changed from v->levels  - 2. Default dmverity assumes atleast 2 levels. data + roothash. 
-	 * Flat model has exactly one level - leaves. So this change supposedly prefetches only leaf nodes
-	 */
-	for (i = 0; i >= 0; i--) {
-#endif
 		sector_t hash_block_start;
 		sector_t hash_block_end;
 		verity_hash_at_level(v, pw->block, i, &hash_block_start, NULL);
