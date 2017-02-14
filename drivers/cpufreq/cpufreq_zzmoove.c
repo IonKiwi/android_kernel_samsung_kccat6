@@ -32,7 +32,9 @@
 // #define DISABLE_POWER_MANAGEMENT
 
 // AP: use msm8974 lcd status notifier
+#if !defined(CONFIG_SEC_KCCAT6_PROJECT) && !defined(CONFIG_SEC_LENTIS_PROJECT)
 #define USE_LCD_NOTIFIER
+#endif
 
 #include <linux/cpu.h>
 #ifdef USE_LCD_NOTIFIER
