@@ -23,7 +23,11 @@
 #define SSP_FIRMWARE_REVISION		15102300
 #define BL_FW_NAME			"ssp_at_tr.fw"
 #else
+#if defined(CONFIG_SEC_LENTIS_PROJECT)
+#define SSP_FIRMWARE_REVISION		16031400
+#else
 #define SSP_FIRMWARE_REVISION		16030700
+#endif
 #define BL_FW_NAME			"ssp_at.fw"
 #endif
 
